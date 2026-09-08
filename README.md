@@ -1,70 +1,44 @@
 # Вычислительная оптимизация
 
-Курс для магистрантов 1-го года. Осенний семестр 2026, занятия по средам с 9 сентября по 23 декабря.
+Курс для магистрантов 1-го года: как записать прикладную задачу в виде задачи оптимизации, какие методы её решают и почему, и как применять готовые солверы осознанно. Осенний семестр 2026, занятия по средам с 9 сентября по 23 декабря, одна пара в неделю: лекция плюс практика на Python.
 
-За основу взята программа курса *Numerical Optimization* М. Диля (Systems Control and Optimization Laboratory, Университет Фрайбурга): <https://www.syscop.de/teaching/ss2025/numerical-optimization>.
+За основу взят курс *Numerical Optimization* М. Диля (Университет Фрайбурга, [syscop.de](https://www.syscop.de/teaching/ss2025/numerical-optimization)): основы и выпуклость → безусловная оптимизация и ньютоновские методы → ограничения-равенства → ограничения-неравенства, SQP и методы внутренней точки → приложения (оптимальное управление, MPC, нелинейный МНК).
+
+<p align="center"><img src="lectures/lecture01/img/06_convex_vs_nonconvex.png" width="640" alt="выпуклая и невыпуклая задачи: куда приходят итерации из разных стартов"></p>
+
+## После курса вы сможете
+
+- записать задачу из своей области в стандартной форме NLP и определить её класс (LP, QP, выпуклая, невыпуклая, целочисленная);
+- проверить условия оптимальности (ККТ) и объяснить, что означают множители Лагранжа;
+- реализовать градиентный спуск, Ньютон, BFGS, SQP и метод внутренней точки самостоятельно и понимать, от чего зависит их сходимость;
+- решать реальные задачи солверами SciPy, CasADi/IPOPT, OSQP: выбрать метод под структуру задачи, интерпретировать результат, диагностировать сбои.
 
 ## Материалы
 
-- [Программа курса](syllabus.md) — цели, календарь, домашние задания, проект, оценивание, литература.
-- Лекции:
-  - Лекция 1. Введение: постановка задачи, классы задач, примеры —
-    [конспект](lectures/lecture01/lecture01.md) · [конспект-ноутбук](lectures/lecture01/lecture01.ipynb) ·
-    [демо-скрипт](lectures/lecture01/demo01.py) · [демо-ноутбук](lectures/lecture01/demo01.ipynb) ·
-    [сценарий доски](lectures/lecture01/board01.md) · [разбор упражнений](lectures/lecture01/exercises01.md)
-- Домашние задания:
-  - [ДЗ 1](homeworks/hw01.md) — ноутбук [`hw01.ipynb`](homeworks/hw01.ipynb), срок сдачи 23 сентября.
-  - Решения — в [`homeworks/solutions/`](homeworks/solutions/), публикуются после дедлайна.
+| № | Дата | Лекция | Материалы |
+|---|------|--------|-----------|
+| 1 | 09.09 | Введение: постановка задачи, классы задач, примеры | [конспект](lectures/lecture01/lecture01.md) · [демо-ноутбук](lectures/lecture01/demo01.ipynb) · [разбор упражнений](lectures/lecture01/exercises01.md) · [ДЗ 1](homeworks/hw01.md) (до 23.09) |
+| 2–16 | 16.09 – 23.12 | см. [календарь в программе курса](syllabus.md#3-календарь) | появляются еженедельно |
 
-Конспект каждой лекции есть в двух форматах: `.md` (читать на GitHub) и `.ipynb` (тот же
-текст ячейками, удобно дополнять своими расчётами). Все картинки лекции лежат в одной папке `img/`;
-иллюстрации конспекта строятся скриптом `make_figures.py`. Демо — тоже в двух форматах: ноутбук — пошаговый
-урок с пояснениями по `scipy.optimize` и стандартной формой каждого примера (собирается
-скриптом `build_demoNN.py`), скрипт — те же примеры компактно, графики сохраняет туда же в `img/` (файлы `demo_*.png`, не коммитятся). Сценарий
-доски — раскадровка для преподавателя: что нарисовать живьём, что вставить заранее.
+[Программа курса](syllabus.md): цели, календарь, домашние задания, проект, оценивание, литература.
 
-## Как запустить код
+## Быстрый старт
 
-Основной способ — [uv](https://docs.astral.sh/uv/) (окружение и зависимости описаны в
-`pyproject.toml` и зафиксированы в `uv.lock`):
+Нужен Python 3.10+. Через [uv](https://docs.astral.sh/uv/):
 
 ```bash
-uv sync                                        # создаёт .venv и ставит зависимости
-uv run python lectures/lecture01/demo01.py     # демо-скрипт
-uv run jupyter lab                             # ноутбуки лекций и демо
+uv sync                  # окружение и зависимости
+uv run jupyter lab       # открыть ноутбуки
 ```
 
-Отдельно активировать окружение не нужно: `uv run` делает это сам. Если всё же хочется —
-`source .venv/bin/activate`.
-
-С лекции 7 понадобится CasADi (алгоритмическое дифференцирование и интерфейс к IPOPT):
-
-```bash
-uv sync --group casadi
-```
-
-PDF из любого markdown-файла (конспект, разбор, ДЗ) собирает `tools/md2pdf.py` — нужен
-установленный Chrome/Chromium и интернет при сборке (формулы рендерит KaTeX с CDN):
-
-```bash
-uv run python tools/md2pdf.py lectures/lecture01/lecture01.md              # lecture01.pdf рядом с md
-uv run python tools/md2pdf.py lectures/lecture01/*.md --out build/pdf      # все md лекции в одну папку
-```
-
-Собранные PDF в git не попадают (`.gitignore`); чтобы выложить — `git add -f`.
-
-Без uv, обычным `pip`:
+Через pip:
 
 ```bash
 python3 -m venv .venv && source .venv/bin/activate
 pip install -r requirements.txt
-python3 lectures/lecture01/demo01.py
+jupyter lab
 ```
 
-## Чтение конспекта в VSCode
+Без установки: откройте любой ноутбук в Google Colab (numpy, scipy и matplotlib там уже есть), например [демо к лекции 1](https://colab.research.google.com/github/IlyaChichkanov/Numerical-Optimization/blob/main/lectures/lecture01/demo01.ipynb) или [ДЗ 1](https://colab.research.google.com/github/IlyaChichkanov/Numerical-Optimization/blob/main/homeworks/hw01.ipynb).
 
-Откройте **папку репозитория целиком** (`code .`, не отдельный файл), установите расширение
-[Markdown All in One](https://marketplace.visualstudio.com/items?itemName=yzhang.markdown-all-in-one),
-затем в любом `.md`-файле нажмите **`Ctrl+Shift+V`** (или иконку превью в верхнем правом углу вкладки) —
-запустится встроенный КаTeX-рендер VSCode и будут видны формулы, таблицы, картинки из папки `img/`.
-Рабочие настройки уже лежат в `.vscode/settings.json`.
+Устройство репозитория, сборка картинок и ноутбуков, PDF — в [docs/tooling.md](docs/tooling.md).
