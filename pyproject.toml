@@ -1,0 +1,29 @@
+[project]
+name = "misis-optimisation"
+version = "0.1.0"
+description = "Вычислительная оптимизация — материалы курса (магистратура, 1 курс)"
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = [
+    "numpy>=1.26",
+    "scipy>=1.11",
+    "matplotlib>=3.8",
+]
+
+[dependency-groups]
+# Среда для запуска ноутбуков лекций и демо.
+notebooks = [
+    "jupyterlab>=4.0",
+    "ipykernel>=6.29",
+    "nbformat>=5.9",
+]
+# Понадобится с лекции 7: алгоритмическое дифференцирование и интерфейс к IPOPT.
+casadi = [
+    "casadi>=3.6",
+]
+docs = [
+    "markdown>=3.6",
+]
+
+[tool.uv]
+default-groups = ["notebooks", "docs"]

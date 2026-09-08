@@ -1,5 +1,8 @@
+# Для pip; основной способ установки — uv sync (см. pyproject.toml и README).
 numpy>=1.26
 scipy>=1.11
 matplotlib>=3.8
+jupyterlab>=4.0
+ipykernel>=6.29
 # Для лекций начиная с 7-й (алгоритмическое дифференцирование, IPOPT):
 # casadi>=3.6

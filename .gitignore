@@ -5,4 +5,9 @@ __pycache__/
 venv/
 *.egg-info/
 .DS_Store
-lectures/*/figures/
+lectures/*/img/demo_*
+.uv-cache/
+# PDF собираются из md скриптом tools/md2pdf.py; чтобы закоммитить — git add -f
+lectures/**/*.pdf
+homeworks/**/*.pdf
+build/

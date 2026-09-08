@@ -119,13 +119,20 @@
 - С лекции 7: CasADi (алгоритмическое дифференцирование, интерфейс к IPOPT и другим солверам).
 - Опционально: cvxpy (моделирование выпуклых задач), OSQP, qpOASES.
 
-Установка: `pip install -r requirements.txt`. Рекомендуется виртуальное окружение.
+Установка: `uv sync` в корне репозитория (или `pip install -r requirements.txt` в виртуальном окружении). Ноутбуки: `uv run jupyter lab`.
 
 ## 9. Структура репозитория
 
 ```
-syllabus.md               программа курса (этот файл)
-lectures/lectureNN/       конспект лекции NN (lectureNN.md) и демо-код (demoNN.py)
-homeworks/hwNN.md         домашние задания
-requirements.txt          зависимости Python
+syllabus.md                 программа курса (этот файл)
+pyproject.toml, uv.lock     зависимости Python (uv); requirements.txt — для pip
+lectures/lectureNN/
+    lectureNN.md, .ipynb    конспект лекции NN (ноутбук собирается из md: tools/md2nb.py)
+    demoNN.py, .ipynb       демо-код
+    img/                    все картинки лекции (иллюстрации конспекта — make_figures.py, вывод демо)
+    exercisesNN.md          разбор упражнений конспекта
+    boardNN.md              сценарий доски для преподавателя
+homeworks/hwNN.md, .ipynb   домашние задания (md — краткое описание, ipynb — рабочий шаблон)
+homeworks/solutions/        решения, публикуются после дедлайна
+tools/                      вспомогательные скрипты: md2nb.py (md -> ipynb), md2pdf.py (md -> pdf)
 ```
