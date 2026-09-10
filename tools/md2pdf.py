@@ -118,10 +118,17 @@ def find_chrome() -> str:
 
 
 def html_to_pdf(html_path: Path, pdf_path: Path, chrome: str) -> None:
-    cmd = [chrome, "--headless=new", "--no-sandbox", "--disable-gpu", "--no-pdf-header-footer",
-           "--virtual-time-budget=20000",            # даём KaTeX дорисовать формулы
-           f"--print-to-pdf={pdf_path}", html_path.resolve().as_uri()]
-    res = subprocess.run(cmd, capture_output=True, text=True)
+    # Отдельный временный профиль: иначе headless Chrome может повиснуть на блокировке
+    # профиля, если у пользователя уже открыт обычный Chrome.
+    with tempfile.TemporaryDirectory(prefix="md2pdf-") as profile:
+        cmd = [chrome, "--headless=new", "--no-sandbox", "--disable-gpu", "--no-pdf-header-footer",
+               f"--user-data-dir={profile}", "--no-first-run", "--disable-extensions",
+               "--virtual-time-budget=20000",            # даём KaTeX дорисовать формулы
+               f"--print-to-pdf={pdf_path}", html_path.resolve().as_uri()]
+        try:
+            res = subprocess.run(cmd, capture_output=True, text=True, timeout=180)
+        except subprocess.TimeoutExpired:
+            sys.exit(f"Chrome не ответил за 180 с: {html_path}")
     if not pdf_path.exists():
         sys.exit(f"Chrome не создал PDF:\n{res.stderr[-2000:]}")
 
