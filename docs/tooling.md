@@ -11,9 +11,13 @@ lectures/lectureNN/
     lectureNN.md            конспект лекции (читать на GitHub)
     lectureNN.ipynb         тот же конспект ячейками (собирается из md: tools/md2nb.py)
     demoNN.ipynb            демонстрации: пошаговый ноутбук с пояснениями по scipy.optimize
+                            (собирается скриптом build_demoNN.py, выполняется nbconvert)
     make_figures.py         скрипт, строящий иллюстрации конспекта в img/
     img/                    картинки лекции (коммитятся)
-    exercisesNN.md          разбор упражнений конспекта
+    exercisesNN.ipynb       разбор упражнений конспекта по шагам, с проверкой кодом
+                            (собирается скриптом build_exercisesNN.py); exercisesNN.md — краткие ответы
+    boardNN.md              для преподавателя: раскадровка доски (что рисовать, что показывать)
+    teachingNN.md           для преподавателя: подсказки к ведению — что говорить, вопросы из зала, практика
 homeworks/hwNN.md, .ipynb   домашние задания: md — краткое описание и правила, ipynb — рабочий шаблон
 homeworks/solutions/        решения, публикуются после дедлайна
 tools/                      вспомогательные скрипты
@@ -36,9 +40,12 @@ tools/                      вспомогательные скрипты
 ```bash
 uv run python lectures/lecture01/make_figures.py          # иллюстрации конспекта -> img/
 uv run python tools/md2nb.py lectures/lecture01/lecture01.md   # конспект md -> ipynb
+uv run python lectures/lecture01/build_demo01.py          # demo01.ipynb (без выводов)
+uv run python lectures/lecture01/build_exercises01.py     # exercises01.ipynb (без выводов)
+uv run jupyter nbconvert --to notebook --execute --inplace lectures/lecture01/demo01.ipynb lectures/lecture01/exercises01.ipynb
 ```
 
-Правило: конспект редактируется в `.md`, ноутбук-версия пересобирается скриптом и не правится руками. Иллюстрации 07–10 повторяют демонстрации ноутбука с теми же данными и seed, чтобы конспект и демо совпадали.
+Правило: конспект редактируется в `.md`, ноутбук-версия пересобирается скриптом и не правится руками. Демо и разбор упражнений редактируются в `build_*.py`, ноутбуки пересобираются и выполняются `nbconvert`, чтобы выводы и картинки лежали в репозитории. Иллюстрации 07–10 повторяют демонстрации ноутбука с теми же данными и seed, чтобы конспект и демо совпадали.
 
 Проверить, что ноутбуки выполняются без ошибок:
 
