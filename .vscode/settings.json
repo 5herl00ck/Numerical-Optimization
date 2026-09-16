@@ -1,0 +1,5 @@
+{
+  "markdown.math.enabled": true,
+  "markdown.preview.breaks": false,
+  "markdown.extension.katex.macros": {}
+}
