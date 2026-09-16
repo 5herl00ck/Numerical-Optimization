@@ -43,7 +43,7 @@ md(r"""# Домашнее задание 1. Постановка и класси
 
 **Выдано:** 9 сентября 2026. **Срок сдачи:** 23 сентября 2026 (до начала занятия). **Максимум:** 10 баллов (+1 бонус).
 
-**Как сдавать.** Заполните этот ноутбук (ответы на теоретические вопросы — в markdown-ячейках, формулы в $\LaTeX$; код — в code-ячейках) и пришлите `.ipynb` **с выполненными ячейками** и его PDF-экспорт (`File → Save and Export Notebook As → PDF` или `HTML → печать в PDF`). Задачи можно обсуждать, но текст и код пишутся самостоятельно.
+**Как сдавать.** Заполните этот ноутбук (ответы на теоретические вопросы — в markdown-ячейках, формулы в $\LaTeX$; код — в code-ячейках), выполните целиком (`Kernel → Restart Kernel and Run All Cells`) и сдайте через pull request: файл `submissions/hw01/<фамилия>.ipynb`, инструкция — [`CONTRIBUTING.md`](../CONTRIBUTING.md). Задачи можно обсуждать, но текст и код пишутся самостоятельно.
 
 **Материал:** лекция 1 ([конспект](../lectures/lecture01/lecture01.md), [демо](../lectures/lecture01/demo01.ipynb)). Ничего сверх лекции не требуется.
 
@@ -191,6 +191,8 @@ def build(solution: bool) -> nbf.NotebookNode:
     nb = nbf.v4.new_notebook()
     for c in cells:
         text = c["solution"] if (solution and c["solution"] is not None) else c["text"]
+        if solution and c["type"] == "markdown":
+            text = text.replace("](../", "](../../")   # решение лежит в solutions/, на уровень глубже шаблона
         if c["type"] == "markdown":
             nb.cells.append(nbf.v4.new_markdown_cell(text))
         else:

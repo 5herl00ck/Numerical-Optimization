@@ -19,7 +19,9 @@ lectures/lectureNN/
     boardNN.md              для преподавателя: раскадровка доски (что рисовать, что показывать)
     teachingNN.md           для преподавателя: подсказки к ведению — что говорить, вопросы из зала, практика
 homeworks/hwNN.md, .ipynb   домашние задания: md — краткое описание и правила, ipynb — рабочий шаблон
-homeworks/solutions/        решения, публикуются после дедлайна
+homeworks/solutions/        решения; build_hwNN.py собирает из одного описания и шаблон hwNN.ipynb,
+                            и hwNN_solution.ipynb (ячейки с полем solution)
+submissions/hwNN/           сданные работы <фамилия>.ipynb — приходят pull request'ами, см. CONTRIBUTING.md
 tools/                      вспомогательные скрипты
 ```
 
@@ -43,6 +45,8 @@ uv run python tools/md2nb.py lectures/lecture01/lecture01.md   # конспек�
 uv run python lectures/lecture01/build_demo01.py          # demo01.ipynb (без выводов)
 uv run python lectures/lecture01/build_exercises01.py     # exercises01.ipynb (без выводов)
 uv run jupyter nbconvert --to notebook --execute --inplace lectures/lecture01/demo01.ipynb lectures/lecture01/exercises01.ipynb
+uv run python homeworks/solutions/build_hw01.py                # hw01.ipynb (шаблон) + solutions/hw01_solution.ipynb
+uv run jupyter nbconvert --to notebook --execute --inplace homeworks/solutions/hw01_solution.ipynb
 ```
 
 Правило: конспект редактируется в `.md`, ноутбук-версия пересобирается скриптом и не правится руками. Демо и разбор упражнений редактируются в `build_*.py`, ноутбуки пересобираются и выполняются `nbconvert`, чтобы выводы и картинки лежали в репозитории. Иллюстрации 07–10 повторяют демонстрации ноутбука с теми же данными и seed, чтобы конспект и демо совпадали.
