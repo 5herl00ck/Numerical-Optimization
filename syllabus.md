@@ -132,7 +132,7 @@ lectures/lectureNN/
     make_figures.py, img/   иллюстрации конспекта и скрипт, который их строит
     exercisesNN.md          разбор упражнений конспекта
 homeworks/hwNN.md, .ipynb   домашние задания (md — краткое описание, ipynb — рабочий шаблон)
-homeworks/solutions/        решения, публикуются после дедлайна (build_hwNN.py собирает шаблон и решение)
+homeworks/solutions/        не публикуются в репозитории; решения преподаватель ведёт отдельно
 submissions/hwNN/           сданные работы: <фамилия>.ipynb, приходят через pull request (CONTRIBUTING.md)
 tools/                      вспомогательные скрипты (md2nb.py: md -> ipynb)
 docs/tooling.md             как собирать материалы, окружение, PDF
