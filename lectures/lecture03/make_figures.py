@@ -40,6 +40,108 @@ def save(name: str) -> None:
     print("  ", name)
 
 
+# ---------------------------------------------------------------- 00 разминка: три задачки раздела 1
+def fig_recap_problems():
+    from scipy.optimize import minimize_scalar
+
+    fig, axes = plt.subplots(1, 3, figsize=(13.5, 4.2), gridspec_kw=dict(width_ratios=[1.15, 1.2, 1]))
+
+    # --- (А) три «середины» одних данных: среднее, медиана (LP), середина размаха (LP)
+    a = np.array([1.0, 2.0, 3.0, 4.0, 20.0])
+    n = len(a)
+    rows, rhs = [], []
+    for i in range(n):                       # -s_i <= x - a_i <= s_i
+        r1 = np.zeros(n + 1); r1[0], r1[1 + i] = 1, -1; rows.append(r1); rhs.append(a[i])
+        r2 = np.zeros(n + 1); r2[0], r2[1 + i] = -1, -1; rows.append(r2); rhs.append(-a[i])
+    lad = linprog(np.r_[0, np.ones(n)], A_ub=np.array(rows), b_ub=rhs,
+                  bounds=[(None, None)] + [(0, None)] * n, method="highs")
+    rows2 = [[1, -1] if k % 2 == 0 else [-1, -1] for k in range(2 * n)]
+    rhs2 = [v for ai in a for v in (ai, -ai)]
+    mm = linprog([0, 1], A_ub=np.array(rows2, float), b_ub=rhs2,
+                 bounds=[(None, None), (0, None)], method="highs")
+    mean, median, midrange = a.mean(), lad.x[0], mm.x[0]
+    assert abs(median - np.median(a)) < 1e-7 and abs(midrange - (a.min() + a.max()) / 2) < 1e-7
+
+    ax = axes[0]
+    ax.set(xlim=(-0.5, 21.5), ylim=(-0.9, 1.5), yticks=[], xlabel="$x$")
+    ax.grid(False)
+    ax.axhline(0, color=GRAY, lw=1.4, zorder=1)
+    ax.plot(a, np.zeros(n), "o", color=INK, ms=8, zorder=5)
+    for ai in a:
+        ax.text(ai, -0.28, f"{ai:g}", ha="center", fontsize=8.5, color=GRAY)
+    for v, col, lab, y in ((median, AQUA, "медиана $3$\n$\\min\\sum|x-a_i|$ — LP", 0.55),
+                           (mean, BLUE, "среднее $6$\n$\\min\\sum(x-a_i)^2$ — QP", 1.05),
+                           (midrange, ORANGE, "середина размаха $10.5$\n$\\min\\max_i|x-a_i|$ — LP", 0.55)):
+        ax.plot([v, v], [0, y - 0.12], color=col, lw=1.6, ls="--")
+        ax.plot(v, 0, "v", color=col, ms=11, zorder=6)
+        ax.text(v, y, lab, ha="center", fontsize=8.5, color=col)
+    ax.set_title("(А) три «середины» одних данных", loc="left")
+
+    # --- (Б) спасатель на пляже: минимум времени, закон Снеллиуса
+    a_s, b_w, d, v1, v2 = 30.0, 20.0, 40.0, 5.0, 1.5
+    T = lambda x: np.sqrt(a_s**2 + x**2) / v1 + np.sqrt(b_w**2 + (d - x)**2) / v2
+    res = minimize_scalar(T, bounds=(0, d), method="bounded", options=dict(xatol=1e-10))
+    xs = res.x
+    s1 = xs / np.sqrt(a_s**2 + xs**2) / v1
+    s2 = (d - xs) / np.sqrt(b_w**2 + (d - xs)**2) / v2
+    assert abs(s1 - s2) < 1e-6, "закон Снеллиуса не выполнен"
+    x_line = d * a_s / (a_s + b_w)         # по прямой: пересечение с берегом
+
+    ax = axes[1]
+    ax.grid(False)
+    ax.axhspan(0, 36, color=YELLOW, alpha=0.18, zorder=0)
+    ax.axhspan(-26, 0, color=BLUE, alpha=0.13, zorder=0)
+    ax.axhline(0, color=GRAY, lw=1.2)
+    ax.text(45, 32, "песок, $v_1 = 5$ м/с", fontsize=8.5, color=GRAY, ha="right")
+    ax.text(1, -4.5, "вода, $v_2 = 1.5$ м/с", fontsize=8.5, color=GRAY)
+    for x_in, col, lab, ls in ((xs, RED, f"оптимум $x^\\ast\\approx{xs:.1f}$ м: {res.fun:.2f} с", "-"),
+                               (d, VIOLET, f"до траверза, затем поперёк: {T(d):.2f} с", "--"),
+                               (x_line, GRAY, f"по прямой: {T(x_line):.2f} с", ":")):
+        ax.plot([0, x_in, d], [a_s, 0, -b_w], color=col, lw=2.2 if col == RED else 1.5, ls=ls, label=lab)
+    ax.plot(0, a_s, "s", color=INK, ms=8, zorder=6)
+    ax.plot(d, -b_w, "*", color=INK, ms=13, zorder=6)
+    ax.plot(xs, 0, "o", color=RED, ms=7, zorder=6)
+    ax.text(-1.5, a_s + 1.5, "спасатель", fontsize=8.5, ha="left")
+    ax.text(d - 1, -b_w - 3.5, "тонущий", fontsize=8.5, ha="right")
+    ax.text(xs + 0.8, 4.5, "$\\frac{\\sin\\theta_1}{v_1}=\\frac{\\sin\\theta_2}{v_2}$", fontsize=10, color=RED)
+    ax.set(xlim=(-3, 46), ylim=(-26, 36), xlabel="вдоль берега, м", yticks=[])
+    ax.legend(fontsize=8, loc="lower left")
+    ax.set_title("(Б) спасатель на пляже: $\\min T(x)$", loc="left")
+
+    # --- (В) центр Чебышёва пятиугольника — LP по (c, r)
+    A = np.array([[-1.0, 0.0], [0.0, -1.0], [1.0, 2.0], [3.0, 1.0], [1.0, -1.0]])
+    b = np.array([0.0, 0.0, 8.0, 12.0, 3.0])
+    norms = np.linalg.norm(A, axis=1)
+    cheb = linprog([0, 0, -1], A_ub=np.c_[A, norms], b_ub=b,
+                   bounds=[(None, None), (None, None), (0, None)], method="highs")
+    c_, r_ = cheb.x[:2], cheb.x[2]
+    mu = -cheb.ineqlin.marginals
+    active = cheb.slack < 1e-9
+    assert abs(r_ - (6 - 2 * np.sqrt(5))) < 1e-6 and active.sum() == 3
+    assert np.all(mu[~active] < 1e-9) and np.allclose(mu @ A, 0, atol=1e-9) and abs(mu @ norms - 1) < 1e-9
+    verts = np.array([[0, 0], [3, 0], [3.75, 0.75], [3.2, 2.4], [0, 4]])
+
+    ax = axes[2]
+    ax.grid(False)
+    ax.add_patch(Polygon(verts, closed=True, facecolor=BLUE, alpha=0.10, edgecolor="none"))
+    ax.add_patch(plt.Circle(c_, r_, facecolor=AQUA, alpha=0.25, edgecolor=AQUA, lw=2))
+    ax.plot(*c_, "o", color=INK, ms=7, zorder=6)
+    ax.plot([c_[0], c_[0] + r_], [c_[1], c_[1]], color=INK, lw=1)
+    ax.text(c_[0] + r_ / 2, c_[1] + 0.12, f"$r={r_:.3f}$", fontsize=8.5, ha="center")
+    # стороны: активные — жирно, с mu_i; неактивные — тонко серым, mu_i = 0
+    edges = [(0, 4), (0, 1), (3, 4), (2, 3), (1, 2)]      # индексы вершин для ограничений 1..5
+    label_pos = [(-0.35, 2.7), (2.0, -0.35), (1.5, 3.5), (3.75, 1.9), (3.6, 0.15)]
+    for i, ((p, q), (lx, ly)) in enumerate(zip(edges, label_pos)):
+        col, lw = (RED, 2.6) if active[i] else (GRAY, 1.3)
+        ax.plot(verts[[p, q], 0], verts[[p, q], 1], color=col, lw=lw, zorder=3)
+        ax.text(lx, ly, f"$\\mu_{i+1}={mu[i]:.3f}$" if active[i] else f"$\\mu_{i+1}=0$",
+                fontsize=8.5, color=col, ha="center", rotation=90 if i == 0 else 0)
+    ax.set(xlim=(-0.7, 4.4), ylim=(-0.7, 4.4), aspect="equal", xlabel="$x_1$", ylabel="$x_2$")
+    ax.set_title("(В) самый большой круг — это LP", loc="left")
+
+    save("00_recap_problems.png")
+
+
 # ---------------------------------------------------------------- 01 слабая двойственность на пальцах
 def fig_weak_duality_line():
     fig, ax = plt.subplots(figsize=(7.5, 2.2))
@@ -299,6 +401,7 @@ def fig_sensitivity():
 
 if __name__ == "__main__":
     print("Сохраняю в", IMG)
+    fig_recap_problems()
     fig_weak_duality_line()
     fig_lagrangian_family()
     fig_geometric_duality()
